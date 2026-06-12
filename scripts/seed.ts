@@ -53,7 +53,7 @@ const BRANDS = [
   {
     key: "nuvira",
     name: "Nuvira Fertility",
-    email: "nuvira.fertility@gmail.com", // PLACEHOLDER — confirm in Settings
+    email: "nuvirafertility@gmail.com",
     watermark_text: "Nuvira Fertility",
     sort_order: 2,
     theme: { primary: "#4E7C4A", accent: "#8BBF6A", bg: "#F3F7EE", surface: "#FFFFFF", ink: "#233322", muted: "#6A7A63" },
