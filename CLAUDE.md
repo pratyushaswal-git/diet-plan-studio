@@ -452,6 +452,12 @@ Migrations / config applied: ... -->
 - **Verified:** `npm run build` green (8 routes, middleware compiled). `.env.local` confirmed untracked.
 - **Note:** Pinned Next to 14.2.35 (patched) over scaffolded 14.2.21. Remaining npm-audit vulns are dev-only (`pdf-parse` transitive deps).
 
+### Batch 1 — Schema & knowledge-base extraction (2026-06-12) · commit `2b94117`
+- **Scope:** DB schema + extract every PDF in `plans/` → normalized seed + idempotent Supabase seeder.
+- **Changes:** `supabase/schema.sql` (6 tables, `set_updated_at` triggers, RLS `authenticated`-all, storage-object policy for `brand-assets`/`plan-pdfs`). `scripts/parse-plans.ts` — positioned-text parser via pdf.js (bundled in `pdf-parse`): groups text items into visual lines (gap-aware spacing), splits label vs 7 weekday columns by x-anchor, finds each row's content-top by **multi-column line alignment** (labels are vertically centered, so a fixed offset fails), strips `[see the recipe below]` markers and links items→recipes by token overlap, dedupes/normalizes into slots/food_items/recipes/notes with usage counts and `is_default` (majority of plans). `scripts/seed.ts` — idempotent upsert of `scripts/.out/seed.json` keyed by natural keys + private bucket creation; brand themes seeded from the CLAUDE.md provisional palette.
+- **Verified:** all 21 plans parse → **9 canonical slots** (After waking up · Breakfast · At 12 pm · Mid morning · Lunch · Evening · Dinner · Before sleep · 20-min walk), 198 food items (30 recipe-linked), 28 recipes, 43 notes (3 important / 40 care). 7 warnings, all benign (multi-line recipe prose without a URL — correctly skipped). `npm run build` green; `tsc --noEmit` clean. Seeder connects + creates both buckets; **blocked on schema** (see note).
+- **Note:** Seeder cannot insert until the coach runs `supabase/schema.sql` in the SQL Editor (tables don't exist yet) — buckets already auto-created. Brand emails: `shecareshelp@gmail.com`, `sadhanatribe.coaching@gmail.com` (canonical of two variants seen); **Nuvira email is a placeholder** (no Nuvira plans had an email) — confirm in Settings. 5 plans had no header email (brand left unset, fine).
+
 ---
 
 ## Backlog
