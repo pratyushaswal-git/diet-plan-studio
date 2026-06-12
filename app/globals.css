@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ===== App shell (fixed neutral palette) ===== */
+    --app-bg: #f7f6f3;
+    --app-surface: #ffffff;
+    --app-ink: #1f1d1a;
+    --app-muted: #6b6760;
+    --app-rule: #e5e2dc;
+
+    /* ===== Brand theme tokens (default = SheCares; overridden at runtime) ===== */
+    --primary: #c25b7a;
+    --accent: #e89aae;
+    --bg: #fcf3f5;
+    --surface: #ffffff;
+    --ink: #3a2230;
+    --muted: #8a6b76;
+
+    /* ===== shadcn semantic tokens (stone base) ===== */
+    --background: 60 9% 98%;
+    --foreground: 20 14% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 20 14% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14% 11%;
+    --primary-hsl: 20 14% 11%;
+    --primary-foreground: 60 9% 98%;
+    --secondary: 60 5% 96%;
+    --secondary-foreground: 20 14% 11%;
+    --muted-bg: 60 5% 96%;
+    --muted-foreground: 25 5% 45%;
+    --accent-bg: 60 5% 96%;
+    --accent-foreground: 20 14% 11%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 60 9% 98%;
+    --border: 20 6% 90%;
+    --input: 20 6% 90%;
+    --ring: 20 14% 11%;
+    --radius: 0.6rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-app-bg text-app-ink;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
