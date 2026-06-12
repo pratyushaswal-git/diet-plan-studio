@@ -446,7 +446,11 @@ Verified: ...
 Out of scope (next): ...
 Migrations / config applied: ... -->
 
-<!-- No build sessions yet — spec authored. First entry will be Batch 0. -->
+### Batch 0 — Repo & scaffold (2026-06-12) · commit `a2da71e`
+- **Scope:** Repo setup + Next.js scaffold.
+- **Changes:** `git init` (local identity Pratyush / pratyush.aswal@gmail.com), remote added. Next.js 14.2.35 (App Router) + TS + Tailwind + shadcn primitives (button/input/label, `cn`, `components.json`). Supabase clients — `lib/supabase/{client,server,middleware}.ts` (browser/server-anon + service-role) — and `middleware.ts` gating all routes except `/login`. Brand theme tokens in `globals.css` + `lib/theme.ts` (seed themes), `PlanBody`/DB row types in `lib/types.ts`. Inter+Lora fonts in `layout.tsx`, sonner toaster. Functional `/login`, app nav with sign-out, placeholder `/plans` + `/settings`. `.env.example`; `.env.local` gitignored.
+- **Verified:** `npm run build` green (8 routes, middleware compiled). `.env.local` confirmed untracked.
+- **Note:** Pinned Next to 14.2.35 (patched) over scaffolded 14.2.21. Remaining npm-audit vulns are dev-only (`pdf-parse` transitive deps).
 
 ---
 
