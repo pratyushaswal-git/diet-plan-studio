@@ -22,6 +22,10 @@ const config: Config = {
           ink: "var(--app-ink)",
           muted: "var(--app-muted)",
           rule: "var(--app-rule)",
+          accent: "var(--app-accent)",
+          "accent-hover": "var(--app-accent-hover)",
+          "accent-fg": "var(--app-accent-fg)",
+          "accent-soft": "var(--app-accent-soft)",
         },
         // Brand theme tokens — set per selected brand at runtime.
         brand: {
@@ -71,6 +75,12 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "calc(var(--radius) + 4px)",
+      },
+      boxShadow: {
+        card: "var(--shadow-card)",
+        "card-hover": "var(--shadow-card-hover)",
+        pop: "var(--shadow-pop)",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
