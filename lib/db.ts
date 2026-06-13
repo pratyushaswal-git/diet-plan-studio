@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Brand, FoodItem, MealSlot, Note, Plan, Recipe } from "@/lib/types";
+import type { Brand, BrandTheme, FoodItem, MealSlot, Note, Plan, PlanStatus, Recipe } from "@/lib/types";
 
 // Typed bank fetchers. All use the session client so RLS applies.
 
@@ -45,6 +45,37 @@ export async function getPlan(id: string): Promise<Plan | null> {
   const { data } = await supabase.from("plans").select("*").eq("id", id).maybeSingle();
   return (data as Plan) ?? null;
 }
+
+// Lean row for the history table — joins the brand for the pill/filter.
+export type PlanListItem = {
+  id: string;
+  client_name: string;
+  title: string | null;
+  status: PlanStatus;
+  created_at: string;
+  brand: { key: string; name: string; theme: BrandTheme } | null;
+};
+
+export async function getPlansList(): Promise<PlanListItem[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("plans")
+    .select("id, client_name, title, status, created_at, brand:brands(key, name, theme)")
+    .order("created_at", { ascending: false });
+  // Supabase types the embedded relation as an array; collapse to a single object.
+  return ((data ?? []) as unknown as RawPlanRow[]).map((r) => ({
+    id: r.id,
+    client_name: r.client_name,
+    title: r.title,
+    status: r.status,
+    created_at: r.created_at,
+    brand: Array.isArray(r.brand) ? (r.brand[0] ?? null) : (r.brand ?? null),
+  }));
+}
+
+type RawPlanRow = Omit<PlanListItem, "brand"> & {
+  brand: PlanListItem["brand"] | PlanListItem["brand"][];
+};
 
 // Distinct past client names — powers the name autocomplete (no clients table).
 export async function getClientNames(): Promise<string[]> {

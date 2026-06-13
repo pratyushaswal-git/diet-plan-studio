@@ -3,8 +3,14 @@ import { Plus } from "lucide-react";
 
 import { AppNav } from "@/components/AppNav";
 import { Button } from "@/components/ui/button";
+import { PlansDashboard } from "@/components/plans/PlansDashboard";
+import { getPlansList } from "@/lib/db";
 
-export default function PlansPage() {
+export const dynamic = "force-dynamic";
+
+export default async function PlansPage() {
+  const plans = await getPlansList();
+
   return (
     <div className="min-h-dvh bg-app-bg">
       <AppNav />
@@ -17,9 +23,7 @@ export default function PlansPage() {
             </Link>
           </Button>
         </div>
-        <p className="mt-2 text-sm text-app-muted">
-          The searchable history table lands in Batch 5. For now, start a new plan above.
-        </p>
+        <PlansDashboard plans={plans} />
       </main>
     </div>
   );

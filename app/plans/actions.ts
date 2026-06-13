@@ -84,6 +84,41 @@ export async function savePlan(
   return { ok: true, id: data.id as string };
 }
 
+export async function deletePlan(id: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("plans").delete().eq("id", id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/plans");
+  return { ok: true };
+}
+
+// Clone a plan's frozen snapshot into a new draft as a starting point.
+export async function duplicatePlan(id: string): Promise<SaveResult> {
+  const supabase = await createClient();
+  const { data: src, error: selErr } = await supabase
+    .from("plans")
+    .select("brand_id, client_name, body")
+    .eq("id", id)
+    .maybeSingle();
+  if (selErr) return { ok: false, error: selErr.message };
+  if (!src) return { ok: false, error: "Plan not found" };
+
+  const { data, error } = await supabase
+    .from("plans")
+    .insert({
+      brand_id: src.brand_id,
+      client_name: src.client_name,
+      title: `${src.client_name} — copy ${format(new Date(), "d MMM yyyy")}`,
+      status: "draft",
+      body: src.body,
+    })
+    .select("id")
+    .single();
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/plans");
+  return { ok: true, id: data.id as string };
+}
+
 export type AddFoodResult = { ok: true; item: FoodItem } | { ok: false; error: string };
 
 // Inline "add new item" from the cell editor → persists to the food bank and
