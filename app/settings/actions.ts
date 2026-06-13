@@ -27,6 +27,10 @@ const schemas: Record<BankTable, z.ZodTypeAny> = {
     email: z.string().trim().email(),
     watermark_text: z.string().trim().min(1),
     logo_url: z.string().trim().nullable().optional(),
+    tagline: z.string().trim().nullable().optional(),
+    website: z.string().trim().nullable().optional(),
+    instagram: z.string().trim().nullable().optional(),
+    phone: z.string().trim().nullable().optional(),
     theme: themeSchema,
     sort_order: z.coerce.number().int(),
     active: z.coerce.boolean(),
@@ -67,7 +71,7 @@ function assertTable(table: string): asserts table is BankTable {
 // Empty-string selects ("none") arrive from native <select>; coerce to null.
 function nullifyEmpty(values: Record<string, unknown>) {
   const out = { ...values };
-  for (const k of ["slot_id", "recipe_id", "default_time", "logo_url"]) {
+  for (const k of ["slot_id", "recipe_id", "default_time", "logo_url", "tagline", "website", "instagram", "phone"]) {
     if (out[k] === "" || out[k] === undefined) out[k] = null;
   }
   return out;

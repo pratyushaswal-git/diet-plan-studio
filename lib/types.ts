@@ -51,6 +51,10 @@ export type PlanBody = {
     email: string;
     watermarkText: string;
     logoUrl?: string;
+    tagline?: string;
+    website?: string;
+    instagram?: string;
+    phone?: string;
     theme: BrandTheme;
   };
   schedule: {
@@ -74,6 +78,10 @@ export type Brand = {
   email: string;
   watermark_text: string;
   logo_url: string | null;
+  tagline: string | null;
+  website: string | null;
+  instagram: string | null;
+  phone: string | null;
   theme: BrandTheme;
   sort_order: number;
   active: boolean;

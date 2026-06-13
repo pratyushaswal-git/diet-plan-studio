@@ -23,6 +23,10 @@ const DEFAULT_THEME: BrandTheme = {
 };
 
 type Editable = Pick<Brand, "key" | "name" | "email" | "watermark_text" | "sort_order" | "active"> & {
+  tagline: string;
+  website: string;
+  instagram: string;
+  phone: string;
   theme: BrandTheme;
 };
 
@@ -57,6 +61,10 @@ function BrandCard({
     name: "",
     email: "",
     watermark_text: "",
+    tagline: "",
+    website: "",
+    instagram: "",
+    phone: "",
     sort_order: 0,
     active: true,
     theme: DEFAULT_THEME,
@@ -134,6 +142,25 @@ function BrandCard({
         <div className="space-y-1">
           <Label className="text-xs text-app-muted">Watermark text</Label>
           <Input value={v.watermark_text} onChange={(e) => set("watermark_text", e.target.value)} />
+        </div>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="space-y-1">
+          <Label className="text-xs text-app-muted">Tagline</Label>
+          <Input value={v.tagline} onChange={(e) => set("tagline", e.target.value)} placeholder="Wellness & Fertility" />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs text-app-muted">Website</Label>
+          <Input value={v.website} onChange={(e) => set("website", e.target.value)} placeholder="brand.in" />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs text-app-muted">Instagram</Label>
+          <Input value={v.instagram} onChange={(e) => set("instagram", e.target.value)} placeholder="@brand" />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs text-app-muted">Phone</Label>
+          <Input value={v.phone} onChange={(e) => set("phone", e.target.value)} placeholder="+91 90000 00000" />
         </div>
       </div>
 
@@ -215,6 +242,10 @@ export function BrandsEditor({
             name: b.name,
             email: b.email,
             watermark_text: b.watermark_text,
+            tagline: b.tagline ?? "",
+            website: b.website ?? "",
+            instagram: b.instagram ?? "",
+            phone: b.phone ?? "",
             sort_order: b.sort_order,
             active: b.active,
             theme: { ...DEFAULT_THEME, ...b.theme },

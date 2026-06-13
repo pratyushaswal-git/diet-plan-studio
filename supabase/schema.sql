@@ -14,12 +14,22 @@ create table if not exists brands (
   email text not null,                      -- printed in PDF header
   watermark_text text not null,             -- diagonal page watermark
   logo_url text,                            -- brand-assets bucket
+  tagline text,                             -- PDF header/footer tagline ('Wellness & Fertility')
+  website text,                             -- contact chip ('shecares.in')
+  instagram text,                           -- contact chip ('@shecares_fertility')
+  phone text,                               -- contact chip ('+91 …')
   theme jsonb not null default '{}'::jsonb, -- { primary, accent, bg, surface, ink, muted }
   sort_order int not null default 0,
   active boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- MIGRATION (existing DBs): add the brand contact columns if the table predates them.
+alter table brands add column if not exists tagline   text;
+alter table brands add column if not exists website   text;
+alter table brands add column if not exists instagram text;
+alter table brands add column if not exists phone     text;
 
 -- ========== MEAL SLOTS (table rows) ==========
 create table if not exists meal_slots (

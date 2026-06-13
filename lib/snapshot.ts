@@ -14,6 +14,10 @@ export function brandRowToSnapshotBrand(brand: Brand, logoUrl?: string): PlanBod
     email: brand.email,
     watermarkText: brand.watermark_text,
     logoUrl: logoUrl ?? undefined,
+    tagline: brand.tagline ?? undefined,
+    website: brand.website ?? undefined,
+    instagram: brand.instagram ?? undefined,
+    phone: brand.phone ?? undefined,
     theme: brand.theme,
   };
 }

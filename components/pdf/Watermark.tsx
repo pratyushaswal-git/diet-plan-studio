@@ -23,7 +23,7 @@ export function Watermark({ text, color }: { text: string; color: string }) {
             <Text
               key={c}
               style={{
-                fontFamily: "Inter",
+                fontFamily: "Mulish",
                 fontSize: 16,
                 color,
                 opacity: 0.05,
