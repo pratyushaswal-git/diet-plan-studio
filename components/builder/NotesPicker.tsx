@@ -22,7 +22,7 @@ function NoteSection({ type, title, bank }: { type: NoteType; title: string; ban
   }, [bank, selected]);
 
   return (
-    <div className="space-y-2 rounded-lg border border-app-rule bg-app-surface p-4">
+    <div className="space-y-2 rounded-xl border border-app-rule bg-app-surface p-4 shadow-card">
       <h3 className="font-serif text-base text-app-ink">{title}</h3>
 
       <div className="space-y-1.5">

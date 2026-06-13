@@ -8,7 +8,7 @@ export function RecipesPreview() {
   const recipes = deriveRecipes(rows);
 
   return (
-    <div className="space-y-2 rounded-lg border border-app-rule bg-app-surface p-4">
+    <div className="space-y-2 rounded-xl border border-app-rule bg-app-surface p-4 shadow-card">
       <h3 className="font-serif text-base text-app-ink">Recipes</h3>
       <p className="text-xs text-app-muted">Auto-derived from the items you picked. Read-only — this is what prints.</p>
       {recipes.length === 0 ? (

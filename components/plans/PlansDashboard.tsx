@@ -4,10 +4,11 @@ import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { Copy, Download, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { ClipboardList, Copy, Download, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { useConfirm } from "@/components/ui/confirm";
@@ -112,7 +113,7 @@ function StatusBadge({ status }: { status: PlanListItem["status"] }) {
 function PlanCard({ plan }: { plan: PlanListItem }) {
   const { pending, onDuplicate, onDelete } = usePlanActions(plan);
   return (
-    <div className={cn("rounded-xl border border-app-rule bg-app-surface p-3 transition-opacity", pending && "opacity-50")}>
+    <div className={cn("rounded-xl border border-app-rule bg-app-surface p-3 shadow-card transition-opacity", pending && "opacity-50")}>
       <div className="flex items-start justify-between gap-2">
         <Link href={`/plans/${plan.id}`} className="font-medium text-app-ink">
           {plan.client_name}
@@ -134,9 +135,14 @@ function PlanRow({ plan }: { plan: PlanListItem }) {
   const { pending, onDuplicate, onDelete } = usePlanActions(plan);
 
   return (
-    <tr className={cn("border-b border-app-rule transition-opacity", pending && "opacity-50")}>
+    <tr
+      className={cn(
+        "border-b border-app-rule transition-colors last:border-b-0 hover:bg-app-bg/60",
+        pending && "opacity-50",
+      )}
+    >
       <td className="py-2.5 pl-3 pr-2">
-        <Link href={`/plans/${plan.id}`} className="font-medium text-app-ink hover:underline">
+        <Link href={`/plans/${plan.id}`} className="font-medium text-app-ink hover:text-app-accent">
           {plan.client_name}
         </Link>
       </td>
@@ -203,22 +209,28 @@ export function PlansDashboard({ plans }: { plans: PlanListItem[] }) {
       </div>
 
       {plans.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-app-rule p-12 text-center">
-          <p className="text-sm text-app-muted">No plans yet.</p>
-          <Button asChild className="mt-3">
+        <Card className="flex flex-col items-center px-6 py-14 text-center shadow-none">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-app-accent-soft text-app-accent">
+            <ClipboardList className="h-6 w-6" />
+          </div>
+          <h3 className="mt-4 font-serif text-lg text-app-ink">No plans yet</h3>
+          <p className="mt-1 max-w-xs text-sm text-app-muted">
+            Build your first weekly diet plan — pick a brand, fill the schedule, and export a polished PDF.
+          </p>
+          <Button asChild className="mt-5">
             <Link href="/plans/new">
               <Plus className="h-4 w-4" /> Create your first plan
             </Link>
           </Button>
-        </div>
+        </Card>
       ) : filtered.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-app-rule p-8 text-center text-sm text-app-muted">
-          No plans match your filters.
-        </p>
+        <Card className="px-6 py-10 text-center text-sm text-app-muted shadow-none">
+          No plans match your search or filter.
+        </Card>
       ) : (
         <>
           {/* Desktop table */}
-          <div className="hidden overflow-hidden rounded-lg border border-app-rule bg-app-surface lg:block">
+          <div className="hidden overflow-hidden rounded-xl border border-app-rule bg-app-surface shadow-card lg:block">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-app-rule text-left text-xs uppercase tracking-wide text-app-muted">

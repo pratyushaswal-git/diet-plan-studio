@@ -10,7 +10,7 @@ export function ClientForm({ clientNames }: { clientNames: string[] }) {
   const setClientField = useBuilder((s) => s.setClientField);
 
   return (
-    <div className="space-y-3 rounded-lg border border-app-rule bg-app-surface p-4">
+    <div className="space-y-3 rounded-xl border border-app-rule bg-app-surface p-4 shadow-card">
       <h2 className="font-serif text-lg text-app-ink">Client details</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-1 sm:col-span-2 lg:col-span-1">
