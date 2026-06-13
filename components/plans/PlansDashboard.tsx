@@ -28,7 +28,7 @@ function BrandPill({ brand }: { brand: PlanListItem["brand"] }) {
   );
 }
 
-function PlanRow({ plan }: { plan: PlanListItem }) {
+function usePlanActions(plan: PlanListItem) {
   const router = useRouter();
   const [pending, start] = useTransition();
 
@@ -57,6 +57,74 @@ function PlanRow({ plan }: { plan: PlanListItem }) {
     });
   }
 
+  return { pending, onDuplicate, onDelete };
+}
+
+function ActionButtons({ plan, pending, onDuplicate, onDelete }: {
+  plan: PlanListItem;
+  pending: boolean;
+  onDuplicate: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <>
+      <Button asChild size="icon" variant="ghost" title="Edit">
+        <Link href={`/plans/${plan.id}`}>
+          <Pencil className="h-4 w-4" />
+        </Link>
+      </Button>
+      <Button size="icon" variant="ghost" title="Duplicate" onClick={onDuplicate} disabled={pending}>
+        <Copy className="h-4 w-4" />
+      </Button>
+      <Button asChild size="icon" variant="ghost" title="Download PDF">
+        <a href={`/api/plans/${plan.id}/pdf`} target="_blank" rel="noreferrer">
+          <Download className="h-4 w-4" />
+        </a>
+      </Button>
+      <Button size="icon" variant="ghost" title="Delete" onClick={onDelete} disabled={pending}>
+        <Trash2 className="h-4 w-4 text-destructive" />
+      </Button>
+    </>
+  );
+}
+
+function StatusBadge({ status }: { status: PlanListItem["status"] }) {
+  return (
+    <span
+      className={cn(
+        "rounded-full px-2 py-0.5 text-xs capitalize",
+        status === "final" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700",
+      )}
+    >
+      {status}
+    </span>
+  );
+}
+
+function PlanCard({ plan }: { plan: PlanListItem }) {
+  const { pending, onDuplicate, onDelete } = usePlanActions(plan);
+  return (
+    <div className={cn("rounded-xl border border-app-rule bg-app-surface p-3 transition-opacity", pending && "opacity-50")}>
+      <div className="flex items-start justify-between gap-2">
+        <Link href={`/plans/${plan.id}`} className="font-medium text-app-ink">
+          {plan.client_name}
+        </Link>
+        <StatusBadge status={plan.status} />
+      </div>
+      <div className="mt-1.5 flex items-center gap-2">
+        <BrandPill brand={plan.brand} />
+        <span className="text-xs text-app-muted">{format(new Date(plan.created_at), "d MMM yyyy")}</span>
+      </div>
+      <div className="mt-2 flex items-center justify-end gap-0.5 border-t border-app-rule pt-1.5">
+        <ActionButtons plan={plan} pending={pending} onDuplicate={onDuplicate} onDelete={onDelete} />
+      </div>
+    </div>
+  );
+}
+
+function PlanRow({ plan }: { plan: PlanListItem }) {
+  const { pending, onDuplicate, onDelete } = usePlanActions(plan);
+
   return (
     <tr className={cn("border-b border-app-rule transition-opacity", pending && "opacity-50")}>
       <td className="py-2.5 pl-3 pr-2">
@@ -69,33 +137,11 @@ function PlanRow({ plan }: { plan: PlanListItem }) {
       </td>
       <td className="px-2 text-sm text-app-muted">{format(new Date(plan.created_at), "d MMM yyyy")}</td>
       <td className="px-2">
-        <span
-          className={cn(
-            "rounded-full px-2 py-0.5 text-xs capitalize",
-            plan.status === "final" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700",
-          )}
-        >
-          {plan.status}
-        </span>
+        <StatusBadge status={plan.status} />
       </td>
       <td className="py-2 pl-2 pr-3">
         <div className="flex items-center justify-end gap-0.5">
-          <Button asChild size="icon" variant="ghost" title="Edit">
-            <Link href={`/plans/${plan.id}`}>
-              <Pencil className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Button size="icon" variant="ghost" title="Duplicate" onClick={onDuplicate} disabled={pending}>
-            <Copy className="h-4 w-4" />
-          </Button>
-          <Button asChild size="icon" variant="ghost" title="Download PDF">
-            <a href={`/api/plans/${plan.id}/pdf`} target="_blank" rel="noreferrer">
-              <Download className="h-4 w-4" />
-            </a>
-          </Button>
-          <Button size="icon" variant="ghost" title="Delete" onClick={onDelete} disabled={pending}>
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
+          <ActionButtons plan={plan} pending={pending} onDuplicate={onDuplicate} onDelete={onDelete} />
         </div>
       </td>
     </tr>
@@ -123,7 +169,7 @@ export function PlansDashboard({ plans }: { plans: PlanListItem[] }) {
 
   return (
     <div className="mt-6 space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative flex-1 sm:max-w-xs">
           <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-app-muted" />
           <Input
@@ -133,17 +179,19 @@ export function PlansDashboard({ plans }: { plans: PlanListItem[] }) {
             className="pl-8"
           />
         </div>
-        <Select value={brandKey} onChange={(e) => setBrandKey(e.target.value)} className="w-48">
-          <option value="">All brands</option>
-          {brands.map(([key, name]) => (
-            <option key={key} value={key}>
-              {name}
-            </option>
-          ))}
-        </Select>
-        <span className="ml-auto text-sm text-app-muted">
-          {filtered.length} of {plans.length}
-        </span>
+        <div className="flex items-center gap-2">
+          <Select value={brandKey} onChange={(e) => setBrandKey(e.target.value)} className="flex-1 sm:w-48">
+            <option value="">All brands</option>
+            {brands.map(([key, name]) => (
+              <option key={key} value={key}>
+                {name}
+              </option>
+            ))}
+          </Select>
+          <span className="shrink-0 text-sm text-app-muted sm:ml-auto">
+            {filtered.length} of {plans.length}
+          </span>
+        </div>
       </div>
 
       {plans.length === 0 ? (
@@ -160,24 +208,34 @@ export function PlansDashboard({ plans }: { plans: PlanListItem[] }) {
           No plans match your filters.
         </p>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-app-rule bg-app-surface">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-app-rule text-left text-xs uppercase tracking-wide text-app-muted">
-                <th className="py-2 pl-3 pr-2 font-medium">Client</th>
-                <th className="px-2 font-medium">Brand</th>
-                <th className="px-2 font-medium">Date</th>
-                <th className="px-2 font-medium">Status</th>
-                <th className="py-2 pl-2 pr-3 text-right font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((p) => (
-                <PlanRow key={p.id} plan={p} />
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {/* Desktop table */}
+          <div className="hidden overflow-hidden rounded-lg border border-app-rule bg-app-surface lg:block">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-app-rule text-left text-xs uppercase tracking-wide text-app-muted">
+                  <th className="py-2 pl-3 pr-2 font-medium">Client</th>
+                  <th className="px-2 font-medium">Brand</th>
+                  <th className="px-2 font-medium">Date</th>
+                  <th className="px-2 font-medium">Status</th>
+                  <th className="py-2 pl-2 pr-3 text-right font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((p) => (
+                  <PlanRow key={p.id} plan={p} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="space-y-2 lg:hidden">
+            {filtered.map((p) => (
+              <PlanCard key={p.id} plan={p} />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
