@@ -30,29 +30,30 @@ export function SettingsTabs({
   ];
 
   const slotFields: FieldDef[] = [
-    { key: "label", label: "Label", type: "text", className: "col-span-2" },
-    { key: "default_time", label: "Default time", type: "text", placeholder: "9:00 am" },
+    { key: "label", label: "Label", type: "text", w: "lg:flex-[2]" },
+    { key: "default_time", label: "Default time", type: "text", placeholder: "9:00 am", w: "lg:w-28" },
     {
       key: "kind",
       label: "Kind",
       type: "select",
       options: ["meal", "hydration", "activity", "other"].map((k) => ({ value: k, label: k })),
+      w: "lg:w-32",
     },
-    { key: "sort_order", label: "Order", type: "number" },
-    { key: "is_default", label: "Default-on", type: "checkbox" },
-    { key: "active", label: "Active", type: "checkbox" },
+    { key: "sort_order", label: "Order", type: "number", w: "lg:w-16" },
+    { key: "is_default", label: "Default-on", type: "checkbox", w: "lg:w-24" },
+    { key: "active", label: "Active", type: "checkbox", w: "lg:w-20" },
   ];
 
   const foodFields: FieldDef[] = [
-    { key: "name", label: "Name", type: "text", className: "col-span-3" },
-    { key: "slot_id", label: "Slot", type: "select", options: slotOptions },
-    { key: "recipe_id", label: "Recipe", type: "select", options: recipeOptions },
-    { key: "active", label: "Active", type: "checkbox" },
+    { key: "name", label: "Name", type: "text", w: "lg:flex-[3]" },
+    { key: "slot_id", label: "Slot", type: "select", options: slotOptions, w: "lg:flex-1" },
+    { key: "recipe_id", label: "Recipe", type: "select", options: recipeOptions, w: "lg:flex-1" },
+    { key: "active", label: "Active", type: "checkbox", w: "lg:w-20" },
   ];
 
   const recipeFields: FieldDef[] = [
-    { key: "title", label: "Title", type: "text", className: "col-span-2" },
-    { key: "url", label: "URL", type: "text", className: "col-span-3" },
+    { key: "title", label: "Title", type: "text", w: "lg:flex-[2]" },
+    { key: "url", label: "URL", type: "text", w: "lg:flex-[3]" },
   ];
 
   const noteFields: FieldDef[] = [
@@ -64,11 +65,12 @@ export function SettingsTabs({
         { value: "important", label: "Important" },
         { value: "care", label: "Please take care" },
       ],
+      w: "lg:w-40",
     },
-    { key: "text", label: "Text", type: "textarea", className: "col-span-3" },
-    { key: "sort_order", label: "Order", type: "number" },
-    { key: "is_default", label: "Default-on", type: "checkbox" },
-    { key: "active", label: "Active", type: "checkbox" },
+    { key: "text", label: "Text", type: "textarea", w: "lg:flex-[3]" },
+    { key: "sort_order", label: "Order", type: "number", w: "lg:w-16" },
+    { key: "is_default", label: "Default-on", type: "checkbox", w: "lg:w-24" },
+    { key: "active", label: "Active", type: "checkbox", w: "lg:w-20" },
   ];
 
   return (
@@ -93,9 +95,10 @@ export function SettingsTabs({
           table="meal_slots"
           fields={slotFields}
           rows={slots as unknown as (Record<string, unknown> & { id: string })[]}
-          layout="grid-cols-[2fr_1fr_1fr_70px_auto_auto_auto] max-lg:grid-cols-2"
           newDefaults={{ kind: "meal", is_default: true, active: true, sort_order: slots.length }}
           description="Meal-schedule rows preloaded into a new plan."
+          addLabel="Add slot"
+          searchKeys={["label"]}
         />
       </TabsContent>
 
@@ -104,10 +107,11 @@ export function SettingsTabs({
           table="food_items"
           fields={foodFields}
           rows={foodItems as unknown as (Record<string, unknown> & { id: string })[]}
-          layout="grid-cols-[3fr_1fr_1fr_auto_auto] max-lg:grid-cols-1"
           newDefaults={{ active: true }}
           searchKeys={["name"]}
           description="Per-slot food bank, ordered by usage."
+          addLabel="Add food item"
+          filters={[{ key: "slot_id", label: "Slot", options: slots.map((s) => ({ value: s.id, label: s.label })) }]}
         />
       </TabsContent>
 
@@ -116,9 +120,9 @@ export function SettingsTabs({
           table="recipes"
           fields={recipeFields}
           rows={recipes as unknown as (Record<string, unknown> & { id: string })[]}
-          layout="grid-cols-[2fr_3fr_auto] max-lg:grid-cols-1"
           searchKeys={["title", "url"]}
           description="Linked from food items; auto-listed in the PDF."
+          addLabel="Add recipe"
         />
       </TabsContent>
 
@@ -127,10 +131,20 @@ export function SettingsTabs({
           table="notes"
           fields={noteFields}
           rows={notes as unknown as (Record<string, unknown> & { id: string })[]}
-          layout="grid-cols-[140px_3fr_70px_auto_auto_auto] max-lg:grid-cols-1"
           newDefaults={{ type: "care", is_default: false, active: true, sort_order: notes.length }}
           searchKeys={["text"]}
           description="IMPORTANT + Please-take-care banks."
+          addLabel="Add note"
+          filters={[
+            {
+              key: "type",
+              label: "Type",
+              options: [
+                { value: "important", label: "Important" },
+                { value: "care", label: "Please take care" },
+              ],
+            },
+          ]}
         />
       </TabsContent>
     </Tabs>
