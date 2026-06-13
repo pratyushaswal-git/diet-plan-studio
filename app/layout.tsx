@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { RouteProgress } from "@/components/nav/RouteProgress";
+import { ConfirmProvider } from "@/components/ui/confirm";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -43,7 +44,7 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${lora.variable}`}>
       <body className="font-sans antialiased">
         <RouteProgress />
-        {children}
+        <ConfirmProvider>{children}</ConfirmProvider>
         <Toaster richColors position="top-center" />
         <ServiceWorkerRegister />
       </body>

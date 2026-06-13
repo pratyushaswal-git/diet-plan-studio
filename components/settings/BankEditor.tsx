@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
+import { useConfirm } from "@/components/ui/confirm";
 import { cn } from "@/lib/utils";
 import { saveRow, deleteRow, type BankTable } from "@/app/settings/actions";
 
@@ -119,6 +120,7 @@ function EditableRow({
   row: Row;
   layout: string;
 }) {
+  const confirm = useConfirm();
   const initial = useMemo(() => toFormValues(fields, row), [fields, row]);
   const [values, setValues] = useState(initial);
   const [pending, start] = useTransition();
@@ -136,8 +138,14 @@ function EditableRow({
     });
   }
 
-  function remove() {
-    if (!confirm("Delete this entry? This can't be undone.")) return;
+  async function remove() {
+    const ok = await confirm({
+      title: "Delete this entry?",
+      description: "This can't be undone.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     start(async () => {
       const res = await deleteRow(table, row.id);
       if (res.ok) toast.success("Deleted");

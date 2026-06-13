@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { useConfirm } from "@/components/ui/confirm";
 import { cn } from "@/lib/utils";
 import { deletePlan, duplicatePlan } from "@/app/plans/actions";
 import type { PlanListItem } from "@/lib/db";
@@ -30,6 +31,7 @@ function BrandPill({ brand }: { brand: PlanListItem["brand"] }) {
 
 function usePlanActions(plan: PlanListItem) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [pending, start] = useTransition();
 
   function onDuplicate() {
@@ -44,8 +46,14 @@ function usePlanActions(plan: PlanListItem) {
     });
   }
 
-  function onDelete() {
-    if (!confirm(`Delete the plan for "${plan.client_name}"? This can't be undone.`)) return;
+  async function onDelete() {
+    const ok = await confirm({
+      title: `Delete ${plan.client_name}'s plan?`,
+      description: "This permanently removes the plan. This can't be undone.",
+      confirmLabel: "Delete plan",
+      destructive: true,
+    });
+    if (!ok) return;
     start(async () => {
       const res = await deletePlan(plan.id);
       if (res.ok) {

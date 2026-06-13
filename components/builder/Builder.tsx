@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Download, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
@@ -16,6 +15,7 @@ import { NotesPicker } from "@/components/builder/NotesPicker";
 import { RecipesPreview } from "@/components/builder/RecipesPreview";
 import { PdfPreview } from "@/components/builder/PdfPreview";
 import { useBuilder, selectPlanBody } from "@/lib/store/builder";
+import { useConfirm } from "@/components/ui/confirm";
 import { themeToCssVars } from "@/lib/theme";
 import { addFoodItem, savePlan } from "@/app/plans/actions";
 import type { BuilderData } from "@/lib/db";
@@ -31,6 +31,7 @@ export function Builder({
   planId?: string | null;
 }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const hydrate = useBuilder((s) => s.hydrate);
   const markSaved = useBuilder((s) => s.markSaved);
   const brand = useBuilder((s) => s.brand);
@@ -80,6 +81,19 @@ export function Builder({
         resolve(res.id);
       });
     });
+  }
+
+  async function onBack() {
+    if (useBuilder.getState().dirty) {
+      const ok = await confirm({
+        title: "Discard unsaved changes?",
+        description: "Your edits to this plan haven't been saved.",
+        confirmLabel: "Discard",
+        destructive: true,
+      });
+      if (!ok) return;
+    }
+    router.push("/plans");
   }
 
   async function onDownload() {
@@ -134,16 +148,14 @@ export function Builder({
       <div className="pt-safe sticky top-0 z-20 border-b border-app-rule bg-app-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-4 py-2.5">
           <div className="flex items-center gap-2">
-            <Link
-              href="/plans"
+            <button
+              type="button"
               className="-ml-1 p-1.5 text-app-muted lg:hidden"
               aria-label="Back to plans"
-              onClick={(e) => {
-                if (dirty && !confirm("Discard unsaved changes?")) e.preventDefault();
-              }}
+              onClick={onBack}
             >
               <ChevronLeft className="h-5 w-5" />
-            </Link>
+            </button>
             <BrandSelector brands={banks.brands} />
           </div>
           <div className="flex items-center gap-2">

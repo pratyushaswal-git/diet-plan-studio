@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useConfirm } from "@/components/ui/confirm";
 import { cn } from "@/lib/utils";
 import { BRAND_THEME_KEYS, type Brand, type BrandTheme } from "@/lib/types";
 import { saveRow, deleteRow, uploadBrandLogo } from "@/app/settings/actions";
@@ -60,6 +61,7 @@ function BrandCard({
     active: true,
     theme: DEFAULT_THEME,
   };
+  const confirm = useConfirm();
   const [v, setV] = useState<Editable>(init);
   const [pending, start] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -81,8 +83,15 @@ function BrandCard({
       } else toast.error(res.error);
     });
   }
-  function remove() {
-    if (!brand || !confirm(`Delete brand "${v.name}"?`)) return;
+  async function remove() {
+    if (!brand) return;
+    const ok = await confirm({
+      title: `Delete "${v.name}"?`,
+      description: "This brand will be removed. Plans already saved keep their frozen copy.",
+      confirmLabel: "Delete brand",
+      destructive: true,
+    });
+    if (!ok) return;
     start(async () => {
       const res = await deleteRow("brands", brand.id);
       if (res.ok) toast.success("Deleted");
