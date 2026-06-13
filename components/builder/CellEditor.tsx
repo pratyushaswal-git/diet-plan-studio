@@ -86,7 +86,7 @@ export function CellEditor({
               >
                 <span className="leading-snug">{it.text}</span>
                 <X
-                  className="mt-0.5 h-3 w-3 shrink-0 cursor-pointer text-app-muted opacity-0 group-hover:opacity-100"
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0 cursor-pointer text-app-muted opacity-100 lg:h-3 lg:w-3 lg:opacity-0 lg:group-hover:opacity-100"
                   onClick={(e) => {
                     e.stopPropagation();
                     removeAt(idx);

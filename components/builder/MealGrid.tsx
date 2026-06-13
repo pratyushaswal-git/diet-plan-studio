@@ -5,6 +5,7 @@ import { ArrowDown, ChevronDown, ChevronUp, CopyMinus, GripVertical, Plus, Repea
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CellEditor } from "@/components/builder/CellEditor";
+import { MealGridMobile } from "@/components/builder/MealGridMobile";
 import { useBuilder } from "@/lib/store/builder";
 import { WEEKDAYS } from "@/lib/types";
 import type { FoodItem, Recipe, Weekday } from "@/lib/types";
@@ -37,12 +38,16 @@ export function MealGrid({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h2 className="font-serif text-lg text-app-ink">Meal schedule</h2>
-        <Button size="sm" variant="outline" onClick={addRow}>
+        <Button size="sm" variant="outline" onClick={addRow} className="hidden lg:inline-flex">
           <Plus className="h-4 w-4" /> Add row
         </Button>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Mobile: day-by-day editor */}
+      <MealGridMobile shared={{ foodBank, recipeById, onAddItem }} />
+
+      {/* Desktop: 7-column grid */}
+      <div className="hidden overflow-x-auto lg:block">
         <div className="min-w-[860px] space-y-2">
           {/* Day header with "copy this day → all rows" */}
           <div className="grid grid-cols-[200px_repeat(7,minmax(86px,1fr))] gap-1.5 px-1">
