@@ -70,8 +70,10 @@ export function CellEditor({
         <button
           type="button"
           className={cn(
-            "flex min-h-[2.25rem] w-full flex-col gap-1 rounded-md border border-app-rule bg-brand-surface p-1.5 text-left text-xs transition-colors hover:border-brand-primary/40",
-            items.length === 0 && "items-center justify-center text-app-muted",
+            "flex min-h-[2.5rem] w-full flex-col gap-1 rounded-lg border p-1.5 text-left text-xs transition-colors",
+            items.length === 0
+              ? "items-center justify-center border-dashed border-app-rule bg-transparent text-app-muted hover:border-brand-primary/50 hover:text-brand-ink"
+              : "border-app-rule bg-brand-surface hover:border-brand-primary/40",
           )}
         >
           {items.length === 0 ? (
