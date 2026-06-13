@@ -106,6 +106,17 @@ export function Builder({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  // Warn before leaving (reload / close / tab switch) with unsaved changes.
+  useEffect(() => {
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      if (!useBuilder.getState().dirty) return;
+      e.preventDefault();
+      e.returnValue = "";
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, []);
+
   const formPane = (
     <div className="space-y-4">
       <ClientForm clientNames={banks.clientNames} />
@@ -123,7 +134,14 @@ export function Builder({
       <div className="pt-safe sticky top-0 z-20 border-b border-app-rule bg-app-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-4 py-2.5">
           <div className="flex items-center gap-2">
-            <Link href="/plans" className="-ml-1 p-1.5 text-app-muted lg:hidden" aria-label="Back to plans">
+            <Link
+              href="/plans"
+              className="-ml-1 p-1.5 text-app-muted lg:hidden"
+              aria-label="Back to plans"
+              onClick={(e) => {
+                if (dirty && !confirm("Discard unsaved changes?")) e.preventDefault();
+              }}
+            >
               <ChevronLeft className="h-5 w-5" />
             </Link>
             <BrandSelector brands={banks.brands} />

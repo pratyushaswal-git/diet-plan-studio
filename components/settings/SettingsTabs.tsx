@@ -73,13 +73,16 @@ export function SettingsTabs({
 
   return (
     <Tabs defaultValue="brands" className="mt-6">
-      <TabsList>
-        <TabsTrigger value="brands">Brands</TabsTrigger>
-        <TabsTrigger value="slots">Slots</TabsTrigger>
-        <TabsTrigger value="food">Food items</TabsTrigger>
-        <TabsTrigger value="recipes">Recipes</TabsTrigger>
-        <TabsTrigger value="notes">Notes</TabsTrigger>
-      </TabsList>
+      {/* Scrollable on mobile so all tabs stay reachable. */}
+      <div className="-mx-4 overflow-x-auto px-4 lg:mx-0 lg:px-0">
+        <TabsList>
+          <TabsTrigger value="brands">Brands</TabsTrigger>
+          <TabsTrigger value="slots">Slots</TabsTrigger>
+          <TabsTrigger value="food">Food items</TabsTrigger>
+          <TabsTrigger value="recipes">Recipes</TabsTrigger>
+          <TabsTrigger value="notes">Notes</TabsTrigger>
+        </TabsList>
+      </div>
 
       <TabsContent value="brands">
         <BrandsEditor brands={brands} logoUrls={logoUrls} />

@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/nav/AppShell";
 import { SettingsTabs } from "@/components/settings/SettingsTabs";
+import { InstallButton } from "@/components/pwa/InstallButton";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import type { Brand, FoodItem, MealSlot, Note, Recipe } from "@/lib/types";
 
@@ -43,6 +44,10 @@ export default async function SettingsPage() {
         <p className="mt-2 text-sm text-app-muted">
           Review and maintain the knowledge base extracted from past plans.
         </p>
+
+        <div className="mt-4">
+          <InstallButton />
+        </div>
 
         {loadError ? (
           <p className="mt-6 rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
