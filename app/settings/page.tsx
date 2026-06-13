@@ -1,4 +1,4 @@
-import { AppNav } from "@/components/AppNav";
+import { AppShell } from "@/components/nav/AppShell";
 import { SettingsTabs } from "@/components/settings/SettingsTabs";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import type { Brand, FoodItem, MealSlot, Note, Recipe } from "@/lib/types";
@@ -37,10 +37,9 @@ export default async function SettingsPage() {
   const loadError = brandsRes.error || slotsRes.error || foodRes.error || recipesRes.error || notesRes.error;
 
   return (
-    <div className="min-h-dvh bg-app-bg">
-      <AppNav />
-      <main className="mx-auto max-w-6xl px-4 py-10">
-        <h1 className="font-serif text-2xl text-app-ink">Settings</h1>
+    <AppShell title="Settings">
+      <main className="mx-auto max-w-6xl px-4 py-6 lg:py-10">
+        <h1 className="hidden font-serif text-2xl text-app-ink lg:block">Settings</h1>
         <p className="mt-2 text-sm text-app-muted">
           Review and maintain the knowledge base extracted from past plans.
         </p>
@@ -60,6 +59,6 @@ export default async function SettingsPage() {
           />
         )}
       </main>
-    </div>
+    </AppShell>
   );
 }

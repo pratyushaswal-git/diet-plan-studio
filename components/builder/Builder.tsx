@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Download, Loader2, Save } from "lucide-react";
+import { ChevronLeft, Download, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppNav } from "@/components/AppNav";
@@ -118,10 +119,15 @@ export function Builder({
     <div className="min-h-dvh bg-app-bg">
       <AppNav />
 
-      {/* Sticky action bar */}
-      <div className="sticky top-0 z-20 border-b border-app-rule bg-app-surface/95 backdrop-blur">
+      {/* Sticky action bar (also the mobile top bar — full-screen editor, no tabs) */}
+      <div className="pt-safe sticky top-0 z-20 border-b border-app-rule bg-app-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-4 py-2.5">
-          <BrandSelector brands={banks.brands} />
+          <div className="flex items-center gap-2">
+            <Link href="/plans" className="-ml-1 p-1.5 text-app-muted lg:hidden" aria-label="Back to plans">
+              <ChevronLeft className="h-5 w-5" />
+            </Link>
+            <BrandSelector brands={banks.brands} />
+          </div>
           <div className="flex items-center gap-2">
             {/* Mobile form/preview toggle */}
             <div className="flex rounded-md border border-app-rule p-0.5 lg:hidden">

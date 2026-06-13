@@ -3,7 +3,7 @@ import Link from "next/link";
 // Fixed neutral app chrome. Brand theming lives only on the builder canvas + PDF.
 export function AppNav() {
   return (
-    <header className="border-b border-app-rule bg-app-surface">
+    <header className="hidden border-b border-app-rule bg-app-surface lg:block">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Link href="/plans" className="font-serif text-lg text-app-ink">
