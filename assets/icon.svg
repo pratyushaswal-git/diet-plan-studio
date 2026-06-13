@@ -1,0 +1,19 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Diet Plan Studio app mark: a calm sage ground with a leaf. Neutral, not brand-specific. -->
+  <rect width="512" height="512" rx="116" fill="#2F5D4E"/>
+  <g transform="translate(256 256) rotate(-42)">
+    <!-- leaf body -->
+    <path d="M0 -148 C 92 -108, 92 108, 0 148 C -92 108, -92 -108, 0 -148 Z" fill="#EAF3EC"/>
+    <!-- central vein -->
+    <path d="M0 -128 L 0 128" stroke="#2F5D4E" stroke-width="15" stroke-linecap="round"/>
+    <!-- side veins -->
+    <g stroke="#2F5D4E" stroke-width="11" stroke-linecap="round" fill="none">
+      <path d="M0 -58 L 52 -92"/>
+      <path d="M0 -58 L -52 -92"/>
+      <path d="M0 4 L 60 -26"/>
+      <path d="M0 4 L -60 -26"/>
+      <path d="M0 64 L 50 34"/>
+      <path d="M0 64 L -50 34"/>
+    </g>
+  </g>
+</svg>

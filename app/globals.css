@@ -47,8 +47,44 @@
   * {
     @apply border-border;
   }
+  html {
+    /* App feel: no blue tap flash, no rubber-band overscroll, stable text size. */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
   body {
     @apply bg-app-bg text-app-ink;
     font-feature-settings: "rlig" 1, "calt" 1;
+    overscroll-behavior-y: none;
+  }
+  /* Standalone (installed) PWA: lock body scroll-bounce, fill the viewport. */
+  @media all and (display-mode: standalone) {
+    body {
+      overscroll-behavior: none;
+    }
+  }
+}
+
+@layer utilities {
+  /* Safe-area helpers for notches / home indicator. */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .h-safe-b {
+    height: env(safe-area-inset-bottom);
+  }
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  /* Inputs ≥16px on mobile so iOS Safari doesn't auto-zoom on focus. */
+  @media (max-width: 1023px) {
+    .text-16-mobile {
+      font-size: 16px;
+    }
   }
 }
