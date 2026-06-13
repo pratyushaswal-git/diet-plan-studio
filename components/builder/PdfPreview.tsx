@@ -7,8 +7,9 @@ import { useBuilder, selectPlanBody } from "@/lib/store/builder";
 import { PlanDocument } from "@/components/pdf/PlanDocument";
 import type { PlanBody } from "@/lib/types";
 
-// PDFViewer is heavy and browser-only — load it lazily, no SSR.
-const PDFViewer = dynamic(() => import("@react-pdf/renderer").then((m) => m.PDFViewer), {
+// PDFViewer is heavy and browser-only. Return the canonical { default } shape
+// next/dynamic expects, and never put it in the server tree (see mounted gate).
+const PDFViewer = dynamic(() => import("@react-pdf/renderer").then((m) => ({ default: m.PDFViewer })), {
   ssr: false,
   loading: () => <PreviewSkeleton label="Loading preview…" />,
 });
@@ -22,6 +23,11 @@ function PreviewSkeleton({ label }: { label: string }) {
 }
 
 export function PdfPreview() {
+  // Only render the viewer after the component has mounted on the client — keeps
+  // the react-pdf lazy boundary out of the SSR tree entirely.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   // Re-render the document on a debounce so typing stays smooth.
   const snapshotJson = useBuilder((s) => JSON.stringify(selectPlanBody(s)));
   const [debounced, setDebounced] = useState(snapshotJson);
@@ -37,7 +43,8 @@ export function PdfPreview() {
 
   const body = useMemo(() => JSON.parse(debounced) as PlanBody, [debounced]);
 
-  // Avoid rendering before the store is hydrated (empty brand).
+  // Wait for client mount and a hydrated brand before mounting the viewer.
+  if (!mounted) return <PreviewSkeleton label="Preview" />;
   if (!body.brand?.key) return <PreviewSkeleton label="Preview" />;
 
   return (
