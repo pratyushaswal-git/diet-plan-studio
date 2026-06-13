@@ -3,6 +3,7 @@ import { Inter, Lora } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
+import { RouteProgress } from "@/components/nav/RouteProgress";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -41,6 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${lora.variable}`}>
       <body className="font-sans antialiased">
+        <RouteProgress />
         {children}
         <Toaster richColors position="top-center" />
         <ServiceWorkerRegister />
