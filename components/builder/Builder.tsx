@@ -13,7 +13,7 @@ import { ClientForm } from "@/components/builder/ClientForm";
 import { MealGrid } from "@/components/builder/MealGrid";
 import { NotesPicker } from "@/components/builder/NotesPicker";
 import { RecipesPreview } from "@/components/builder/RecipesPreview";
-import { PdfPreview } from "@/components/builder/PdfPreview";
+import { PlanPreview } from "@/components/builder/PlanPreview";
 import { useBuilder, selectPlanBody } from "@/lib/store/builder";
 import { useConfirm } from "@/components/ui/confirm";
 import { themeToCssVars } from "@/lib/theme";
@@ -203,7 +203,7 @@ export function Builder({
             )}
           >
             <div className="h-[calc(100dvh-180px)] lg:h-full">
-              <PdfPreview />
+              <PlanPreview />
             </div>
           </div>
         </div>

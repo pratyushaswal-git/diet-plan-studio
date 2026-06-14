@@ -1,10 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // @react-pdf/renderer must stay an external Node module on the server, or its
-  // react-reconciler gets the RSC React subset and throws "Component is not a
-  // constructor". The client preview imports it dynamically (ssr:false).
   experimental: {
-    serverComponentsExternalPackages: ["@react-pdf/renderer"],
+    // Headless-Chrome deps must stay external Node modules (native binary /
+    // runtime extraction); never bundle them into the server build.
+    serverComponentsExternalPackages: ["puppeteer-core", "@sparticuz/chromium", "puppeteer"],
+    // The PDF route reads the bundled TTFs off disk → include them in its trace.
+    outputFileTracingIncludes: {
+      "/api/plans/[id]/pdf": ["./public/fonts/**"],
+    },
   },
   images: {
     remotePatterns: [

@@ -1,11 +1,11 @@
+import type { CSSProperties } from "react";
+
 import type { BrandTheme } from "@/lib/types";
 
 // ============================================================================
-// Brand theme (6 locked tokens) → the design's extended palette.
-// The locked "Day Cards" design (Claude Design handoff) uses a richer token set
-// — primary-deep, primary-tint, paper, hair, etc. We derive all of it from each
-// brand's six tokens so SheCares / Sadhana Tribe / Nuvira each render in their
-// own colours. One source (brands.theme), one expander, every PDF subcomponent.
+// Brand theme (6 locked tokens) → the locked "Day Cards" design's extended
+// palette + the CSS custom properties it expects. One source (brands.theme),
+// two consumers: the live <PlanView> preview and the headless-Chrome PDF export.
 // ============================================================================
 
 const WHITE = "#FFFFFF";
@@ -34,7 +34,7 @@ export function mix(a: string, b: string, t: number): string {
 export const lighten = (hex: string, t: number) => mix(hex, WHITE, t);
 export const darken = (hex: string, t: number) => mix(hex, BLACK, t);
 
-export type PdfPalette = {
+export type Palette = {
   primary: string;
   primaryDeep: string;
   primaryTint: string;
@@ -42,17 +42,17 @@ export type PdfPalette = {
   accent: string;
   accentSoft: string;
   blush: string;
-  paper: string; // page background (warm cream)
-  paper2: string; // tinted panels / day-card header fallback
-  surface: string; // white cards
+  paper: string;
+  paper2: string;
   ink: string;
   inkSoft: string;
   inkFaint: string;
-  hair: string; // hairlines / dashed separators
+  hair: string;
+  hair2: string;
 };
 
-export function expandTheme(theme: BrandTheme): PdfPalette {
-  const { primary, accent, bg, surface, ink, muted } = theme;
+export function expandTheme(theme: BrandTheme): Palette {
+  const { primary, accent, bg, ink, muted } = theme;
   return {
     primary,
     primaryDeep: darken(primary, 0.28),
@@ -63,10 +63,32 @@ export function expandTheme(theme: BrandTheme): PdfPalette {
     blush: mix(primary, WHITE, 0.9),
     paper: bg,
     paper2: mix(bg, primary, 0.06),
-    surface,
     ink,
     inkSoft: muted,
     inkFaint: mix(muted, WHITE, 0.35),
     hair: mix(bg, ink, 0.1),
+    hair2: mix(bg, ink, 0.05),
   };
+}
+
+// The design's CSS custom properties, as an inline style object for the
+// <PlanView> root. Fixed tokens (fonts/radius/shadow) live in plan-view.css.
+export function themeToPlanVars(theme: BrandTheme): CSSProperties {
+  const p = expandTheme(theme);
+  return {
+    "--primary": p.primary,
+    "--primary-deep": p.primaryDeep,
+    "--primary-tint": p.primaryTint,
+    "--primary-tint-2": p.primaryTint2,
+    "--accent": p.accent,
+    "--accent-soft": p.accentSoft,
+    "--blush": p.blush,
+    "--paper": p.paper,
+    "--paper-2": p.paper2,
+    "--ink": p.ink,
+    "--ink-soft": p.inkSoft,
+    "--ink-faint": p.inkFaint,
+    "--hair": p.hair,
+    "--hair-2": p.hair2,
+  } as CSSProperties;
 }
