@@ -71,7 +71,9 @@ function assertTable(table: string): asserts table is BankTable {
 // Empty-string selects ("none") arrive from native <select>; coerce to null.
 function nullifyEmpty(values: Record<string, unknown>) {
   const out = { ...values };
-  for (const k of ["slot_id", "recipe_id", "default_time", "logo_url", "tagline", "website", "instagram", "phone"]) {
+  // NB: logo_url is intentionally NOT here — it's managed by uploadBrandLogo, and
+  // coercing an absent/undefined value to null would wipe an uploaded logo on save.
+  for (const k of ["slot_id", "recipe_id", "default_time", "tagline", "website", "instagram", "phone"]) {
     if (out[k] === "" || out[k] === undefined) out[k] = null;
   }
   return out;

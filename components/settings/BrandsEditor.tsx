@@ -84,7 +84,11 @@ function BrandCard({
 
   function save() {
     start(async () => {
-      const res = await saveRow("brands", brand?.id ?? null, { ...v, logo_url: brand?.id ? undefined : null });
+      // Existing brand: omit logo_url so the update never touches it (the logo is
+      // managed by uploadBrandLogo). New brand: start with no logo.
+      const payload: Record<string, unknown> = { ...v };
+      if (!brand?.id) payload.logo_url = null;
+      const res = await saveRow("brands", brand?.id ?? null, payload);
       if (res.ok) {
         toast.success(isNew ? "Brand added" : "Saved");
         if (isNew) setV(init);
