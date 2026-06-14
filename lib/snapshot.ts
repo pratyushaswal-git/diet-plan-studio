@@ -1,19 +1,21 @@
 import { WEEKDAYS } from "@/lib/types";
 import type { Brand, CellItem, DayCells, MealSlot, Note, PlanBody, ScheduleRow } from "@/lib/types";
+import { brandLogoUrl } from "@/lib/logo";
 
 export function emptyDayCells(): DayCells {
   return { Mon: [], Tue: [], Wed: [], Thu: [], Fri: [], Sat: [], Sun: [] };
 }
 
 // The PDF/snapshot brand block, frozen from a brand bank row.
-// logoUrl is passed in resolved (signed/public) form — a storage path isn't renderable.
+// logoUrl resolves to the public object URL (brand-assets is public) so it's
+// renderable everywhere and stable when frozen; an explicit override still wins.
 export function brandRowToSnapshotBrand(brand: Brand, logoUrl?: string): PlanBody["brand"] {
   return {
     key: brand.key,
     name: brand.name,
     email: brand.email,
     watermarkText: brand.watermark_text,
-    logoUrl: logoUrl ?? undefined,
+    logoUrl: logoUrl ?? brandLogoUrl(brand.logo_url),
     tagline: brand.tagline ?? undefined,
     website: brand.website ?? undefined,
     instagram: brand.instagram ?? undefined,

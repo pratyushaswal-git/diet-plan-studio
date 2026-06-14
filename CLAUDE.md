@@ -525,6 +525,12 @@ Migrations / config applied: ... -->
 - **Verified:** `tsc` + `npm run build` green (builder pages dropped ~595 kB → ~164 kB First-Load JS with react-pdf gone). **Standalone headless render (full `puppeteer`) for all 3 brands → valid `%PDF-` (~469 KB, single 2615 px page), rasterized w/ PyMuPDF + visually inspected:** **exact match to the design** — radial header wash, real plum/green **gradient** client band + day-card headers (`Monday 01…Sunday 07`), contact chips, recipe pills, "gentle reminder" gradient box + check-dot care list, **recipe cards with real YouTube thumbnails**, footer; `₹ ½ ¼` + curly quotes; **SheCares (rose) vs Nuvira (green) confirm per-brand re-theming**. Live `PlanPreview` shares the same component+CSS (verified by build; left for live confirm).
 - **⚠ Deploy risk (flag to coach):** `@sparticuz/chromium` must fit Vercel hobby limits (~50 MB function, ~1 GB memory, 60 s). Standard combo, generally fine, but confirm on first deploy; fall back to an external render service if it exceeds limits.
 
+### Batch 9.1 — Brand logo wiring (2026-06-14)
+- **Bug:** Coach uploaded a logo + saved → it showed in Settings (signed-URL preview) but **not** in the builder preview or the exported PDF. Cause: `BrandSelector` + the builder pages built the snapshot via `brandRowToSnapshotBrand(b)` with **no** logo URL, so `body.brand.logoUrl` was `undefined`; and `brands.logo_url` is a storage path in a **private** bucket (not a renderable URL).
+- **Fix:** brand logos belong on the shared plan, so serve them from a **stable public URL**. New `lib/logo.ts` `brandLogoUrl(path)` builds the deterministic public object URL (works sync in client + server + headless Chrome, and is stable when frozen in the snapshot; passes through full URLs for back-compat). `brandRowToSnapshotBrand` now defaults `logoUrl` to `brandLogoUrl(brand.logo_url)`. `supabase/schema.sql` migration sets `brand-assets` bucket **public** (plan-pdfs stays private); authenticated-write policy unchanged. Settings preview untouched (signed URLs still work).
+- **Verified:** `tsc` + build green; standalone headless render with a logo → the circular brandmark renders in the header + footer per the design; `brandLogoUrl` URL shapes confirmed.
+- **⚠ Coach action:** run `update storage.buckets set public = true where id = 'brand-assets';` in the Supabase SQL editor (or toggle the bucket to Public in Dashboard → Storage). Then the already-uploaded logo appears in new plans; older saved plans pick it up on re-save / brand re-select.
+
 ---
 
 ## Backlog

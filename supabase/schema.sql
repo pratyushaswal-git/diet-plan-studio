@@ -131,8 +131,14 @@ create policy auth_all on food_items for all to authenticated using (true) with 
 create policy auth_all on notes      for all to authenticated using (true) with check (true);
 create policy auth_all on plans      for all to authenticated using (true) with check (true);
 
--- ========== Storage: private buckets, authenticated read/write ==========
+-- ========== Storage: buckets + policies ==========
 -- Buckets themselves are created by scripts/seed.ts (or manually in Dashboard → Storage).
+-- brand-assets is PUBLIC: logos appear on shared plans (preview + exported PDF),
+-- so they're served via stable public object URLs (see lib/logo.ts). plan-pdfs
+-- stays private. Authenticated write is still required (upload), enforced below.
+update storage.buckets set public = true  where id = 'brand-assets';
+update storage.buckets set public = false where id = 'plan-pdfs';
+
 drop policy if exists auth_storage_all on storage.objects;
 create policy auth_storage_all on storage.objects
   for all to authenticated
