@@ -23,12 +23,14 @@ export default function LoginPage() {
     setLoading(true);
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
 
     if (error) {
+      setLoading(false);
       toast.error(error.message);
       return;
     }
+    // Keep the button in its loading state through the redirect (the component
+    // unmounts on navigation) so there's continuous feedback after sign-in.
     router.replace("/plans");
     router.refresh();
   }

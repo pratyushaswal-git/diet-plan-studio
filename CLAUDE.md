@@ -532,6 +532,17 @@ Migrations / config applied: ... -->
 - **⚠ Coach action:** run `update storage.buckets set public = true where id = 'brand-assets';` in the Supabase SQL editor (or toggle the bucket to Public in Dashboard → Storage). Then the already-uploaded logo appears in new plans; older saved plans pick it up on re-save / brand re-select.
 - **Follow-up bug (same day):** saving a brand **wiped its logo**. `BrandsEditor.save()` sent `logo_url: undefined` for existing brands and `nullifyEmpty` (in `app/settings/actions.ts`) coerced it to `null` → the update erased the uploaded path, so the logo never reached plans. Fix: dropped `logo_url` from `nullifyEmpty`'s key list, and `save()` now omits `logo_url` for existing brands (only sets `null` on new-brand insert). Logo upload stays a separate immediate action (`uploadBrandLogo`) — no Save needed. Coach must **re-upload** the logo once (prior saves had nulled it).
 
+### Batch 10 — Production deploy + git/hosting setup + nav feedback (2026-06-14)
+- **Live:** https://diet-plan-studio-mu.vercel.app/ — deployed on **Nuvira's Vercel account**.
+- **Git/hosting setup (record for future):**
+  - Code now lives on Nuvira's GitHub: **`nuvirafertility/diet-studio`** (private). The original personal repo (`pratyushaswal-git/diet-plan-studio`) is kept as a backup.
+  - Pratyush (`pratyushaswal-git`) was added as a **collaborator (Write)** on `nuvirafertility/diet-studio` so the local clone can push (a private repo returns "Repository not found" to creds without access). The invite must be **accepted** before pushing works.
+  - Local remotes: `nuvira` → Nuvira repo (and `main` **tracks `nuvira/main`**, so plain `git push`/`pull` go to Nuvira); `origin` → personal backup repo. Push to backup explicitly with `git push origin main`.
+  - **Vercel** is on Nuvira's account, connected to the `nuvirafertility` GitHub via the Vercel GitHub App (single-account, no cross-account collaborator needed for Vercel). Auto-deploys on push to `main`.
+  - **Env vars on Vercel** (Production + Preview + Development): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, and **`PUPPETEER_SKIP_DOWNLOAD=true`** (stops the dev-only `puppeteer` from downloading Chromium during the build; prod uses `@sparticuz/chromium`). Same Supabase project as before.
+  - Note: Vercel "Collaborator/invite team members" requires a **Pro** plan; not needed for this single-owner setup.
+- **Fix — navigation feedback wasn't visible.** Coach saw no loading indication on login / page switches. Cause: routes are prefetched so client navigations are near-instant → the `RouteProgress` bar + `loading.tsx` skeletons flashed too briefly, and login/redirects are **programmatic** (not link clicks) so the click-driven bar never started. Fixes in `components/nav/RouteProgress.tsx`: (1) **minimum visible duration** (600 ms) so even instant navigations show a perceptible bar; (2) patch `history.pushState/replaceState` so **programmatic** navigations (post-login `router.replace`, duplicate-plan, builder save→URL) also trigger the bar; (3) bar made more prominent (3px + accent glow). `app/login/page.tsx` keeps the Sign-in button spinning through the redirect (no premature `setLoading(false)`). Verified: bar renders on programmatic nav (3px, evergreen accent, glow), no console errors.
+
 ---
 
 ## Backlog
