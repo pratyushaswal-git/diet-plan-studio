@@ -1,16 +1,17 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
 import { AppShell } from "@/components/nav/AppShell";
 import { Button } from "@/components/ui/button";
 import { PlansDashboard } from "@/components/plans/PlansDashboard";
+import { PlansListSkeleton } from "@/components/skeletons/PlansListSkeleton";
 import { getPlansList } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-export default async function PlansPage() {
-  const plans = await getPlansList();
-
+export default function PlansPage() {
+  // Instant shell + header; the list streams in (skeleton shows meanwhile).
   return (
     <AppShell title="Plans">
       <main className="mx-auto max-w-6xl px-4 py-6 lg:py-10">
@@ -22,8 +23,15 @@ export default async function PlansPage() {
             </Link>
           </Button>
         </div>
-        <PlansDashboard plans={plans} />
+        <Suspense fallback={<PlansListSkeleton />}>
+          <PlansData />
+        </Suspense>
       </main>
     </AppShell>
   );
+}
+
+async function PlansData() {
+  const plans = await getPlansList();
+  return <PlansDashboard plans={plans} />;
 }

@@ -557,6 +557,13 @@ Migrations / config applied: ... -->
 - **Browser reuse:** `render-pdf.ts` caches a module-level `browserPromise`; `getBrowser()` reuses it if `connected`, else relaunches; `htmlToPdf` closes the page (not the browser) and destroys the cached browser on error (self-heals a thawed/dead serverless browser). Image-wait cap lowered 8 s→6 s (only fonts + logo now).
 - **Verified:** `tsc` + `npm run build` green. **Standalone headless render (full `puppeteer`) → valid `%PDF-` ~287 KB** (was ~469 KB with thumbnails); rasterized + inspected: text recipe cards (tinted band + play + Short/Video tag + name + Watch, no photos), gradients/header-wash/logo/notes intact, trimmed fonts render correctly (serif headings, italic "Diet Plan", Mulish body). Cache/reuse paths verified by build + reasoning (exercise on deploy: 1st Download renders+caches, 2nd is instant, edit→re-renders).
 
+### Batch 12 — Streamed skeletons on every load (2026-06-15)
+- **Why:** loads felt "cold" — the route progress bar showed but page **skeletons didn't**. Cause: each page was one `async` server component that awaited its data before returning any HTML, so hard loads/first opens were blank until data resolved; `loading.tsx` only covers client-nav.
+- **Fix:** each data page now returns an **instant shell + `<Suspense fallback={skeleton}>`** around an async data sub-component, so the chrome + a pulsing skeleton stream immediately and content fills in (works on hard loads, refresh, and nav). Pattern: `Page()` (sync, renders `AppShell`/header + Suspense) → `PageData()` (async, awaits the fetch → real content). `force-dynamic` kept.
+- **Files:** new shared skeletons `components/skeletons/PlansListSkeleton.tsx` + `SettingsContentSkeleton.tsx` (used by both the page Suspense and `loading.tsx`); refactored `app/plans/page.tsx`, `app/settings/page.tsx`, `app/plans/new/page.tsx`, `app/plans/[id]/page.tsx` (builder pages wrap `getBuilderData`/`getPlan` in Suspense with the existing `BuilderSkeleton` — the biggest win); `app/plans/loading.tsx` + `app/settings/loading.tsx` re-pointed to `AppShell` + shared skeletons (builder `loading.tsx` already used `BuilderSkeleton`). `AppShell`/`BuilderSkeleton` are data-free so the shell streams with zero data.
+- **Verified:** `tsc` + `npm run build` green; dev: `/login` 200, `/plans` redirects (auth) — routes compile, **no console/server errors**. Warm skeleton feel confirmed on the live deploy.
+- **Subdomain:** app is being served at **`dietstudio.nuvirahealth.in`** (Vercel Domains → add subdomain → CNAME `dietstudio` → `cname.vercel-dns.com` at the `nuvirahealth.in` DNS host; Vercel auto-issues TLS). No app/env/Supabase change needed — relative URLs + cookie auth work on any host.
+
 ---
 
 ## Backlog

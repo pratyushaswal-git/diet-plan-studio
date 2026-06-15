@@ -1,21 +1,17 @@
-import { AppNav } from "@/components/AppNav";
+import { AppShell } from "@/components/nav/AppShell";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PlansListSkeleton } from "@/components/skeletons/PlansListSkeleton";
 
 export default function PlansLoading() {
   return (
-    <div className="min-h-dvh bg-app-bg">
-      <AppNav />
-      <main className="mx-auto max-w-6xl px-4 py-10">
+    <AppShell title="Plans">
+      <main className="mx-auto max-w-6xl px-4 py-6 lg:py-10">
         <div className="flex items-center justify-between">
-          <Skeleton className="h-7 w-28" />
-          <Skeleton className="h-9 w-28" />
+          <Skeleton className="hidden h-8 w-24 lg:block" />
+          <Skeleton className="h-9 w-28 max-lg:w-full" />
         </div>
-        <div className="mt-6 space-y-2">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full" />
-          ))}
-        </div>
+        <PlansListSkeleton />
       </main>
-    </div>
+    </AppShell>
   );
 }
