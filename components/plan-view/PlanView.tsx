@@ -259,10 +259,9 @@ export function PlanView({ body }: { body: PlanBody }) {
                 const yt = youtube(r.url);
                 return (
                   <a className="rcard" key={r.url} href={r.url} target="_blank" rel="noopener noreferrer">
+                    {/* Text/offline card: no fetched thumbnail (saves render cost/memory) —
+                        a tinted band with a play badge + Short/Video tag. */}
                     <div className="rcard__thumb">
-                      {yt ? (
-                        <img src={`https://img.youtube.com/vi/${yt.id}/hqdefault.jpg`} alt={r.title} />
-                      ) : null}
                       <span className="rcard__tag">{yt?.short ? "Short" : "Video"}</span>
                       <span className="rcard__play">
                         <span>{Icon.play}</span>

@@ -11,17 +11,14 @@ import type { Browser } from "puppeteer-core";
 
 type FaceDef = { file: string; family: "Cormorant" | "Mulish"; weight: number; style: "normal" | "italic" };
 
+// Only the weights the design actually uses (trimmed 13 → 7) — smaller inlined
+// HTML, faster font parsing, less memory. Cormorant 500/600 + italic-500; Mulish
+// 400/600/700/800. Keep in sync with the @font-face block in plan-view-css.ts.
 const FACES: FaceDef[] = [
-  { file: "Cormorant-Regular.ttf", family: "Cormorant", weight: 400, style: "normal" },
   { file: "Cormorant-Medium.ttf", family: "Cormorant", weight: 500, style: "normal" },
   { file: "Cormorant-SemiBold.ttf", family: "Cormorant", weight: 600, style: "normal" },
-  { file: "Cormorant-Bold.ttf", family: "Cormorant", weight: 700, style: "normal" },
-  { file: "Cormorant-Italic.ttf", family: "Cormorant", weight: 400, style: "italic" },
   { file: "Cormorant-MediumItalic.ttf", family: "Cormorant", weight: 500, style: "italic" },
-  { file: "Cormorant-SemiBoldItalic.ttf", family: "Cormorant", weight: 600, style: "italic" },
-  { file: "Mulish-Light.ttf", family: "Mulish", weight: 300, style: "normal" },
   { file: "Mulish-Regular.ttf", family: "Mulish", weight: 400, style: "normal" },
-  { file: "Mulish-Medium.ttf", family: "Mulish", weight: 500, style: "normal" },
   { file: "Mulish-SemiBold.ttf", family: "Mulish", weight: 600, style: "normal" },
   { file: "Mulish-Bold.ttf", family: "Mulish", weight: 700, style: "normal" },
   { file: "Mulish-ExtraBold.ttf", family: "Mulish", weight: 800, style: "normal" },
@@ -44,7 +41,7 @@ export async function fontFaceBase64(): Promise<string> {
   return fontFaceCache;
 }
 
-async function getBrowser(): Promise<Browser> {
+async function launchBrowser(): Promise<Browser> {
   const puppeteer = await import("puppeteer-core");
   const isServerless =
     !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME || !!process.env.AWS_EXECUTION_ENV;
@@ -76,15 +73,45 @@ async function getBrowser(): Promise<Browser> {
   });
 }
 
+// Reuse the browser across warm invocations — launching Chromium is the most
+// expensive step, so we keep one instance and only relaunch if it died.
+let browserPromise: Promise<Browser> | null = null;
+
+async function getBrowser(): Promise<Browser> {
+  if (browserPromise) {
+    try {
+      const b = await browserPromise;
+      if (b.connected) return b;
+    } catch {
+      /* previous launch failed — fall through and relaunch */
+    }
+  }
+  browserPromise = launchBrowser();
+  return browserPromise;
+}
+
+async function destroyBrowser(): Promise<void> {
+  const p = browserPromise;
+  browserPromise = null;
+  if (p) {
+    try {
+      await (await p).close();
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
 export async function htmlToPdf(html: string): Promise<Buffer> {
   const browser = await getBrowser();
+  let page: Awaited<ReturnType<Browser["newPage"]>> | undefined;
   try {
-    const page = await browser.newPage();
+    page = await browser.newPage();
     await page.setViewport({ width: 980, height: 1400 });
     await page.setContent(html, { waitUntil: "load", timeout: 30000 });
 
-    // Wait for webfonts + images (recipe thumbnails), but cap it so a slow/blocked
-    // thumbnail can't hang the render — the placeholder still shows.
+    // Wait for webfonts + the brand logo image, capped so a slow asset can't hang
+    // the render. (Recipe thumbnails were dropped, so this is just fonts + logo.)
     await Promise.race([
       page.evaluate(async () => {
         const d = document as Document & { fonts?: { ready: Promise<unknown> } };
@@ -100,7 +127,7 @@ export async function htmlToPdf(html: string): Promise<Buffer> {
           ),
         );
       }),
-      new Promise((res) => setTimeout(res, 8000)),
+      new Promise((res) => setTimeout(res, 6000)),
     ]);
 
     const height = await page.evaluate(() => Math.ceil(document.documentElement.scrollHeight));
@@ -112,7 +139,12 @@ export async function htmlToPdf(html: string): Promise<Buffer> {
       margin: { top: 0, right: 0, bottom: 0, left: 0 },
     });
     return Buffer.from(pdf);
+  } catch (err) {
+    // A wedged/thawed browser can break mid-render — drop it so the next call
+    // relaunches clean instead of reusing a dead instance.
+    await destroyBrowser();
+    throw err;
   } finally {
-    await browser.close();
+    if (page) await page.close().catch(() => {});
   }
 }

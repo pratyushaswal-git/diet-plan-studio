@@ -6,16 +6,13 @@
 // properties on the .plan-view root (see themeToPlanVars). @font-face here is the
 // browser-preview path (url /fonts/*); the export route prepends base64 faces.
 export const PLAN_VIEW_CSS = String.raw`
-@font-face { font-family: "Cormorant"; font-weight: 400; font-style: normal; src: url("/fonts/Cormorant-Regular.ttf") format("truetype"); }
+/* Only the weights the design actually uses (trimmed from 13 → 7 to shrink the
+   inlined payload / parse cost / memory). Cormorant 500/600 + italic-500; Mulish
+   400/600/700/800. */
 @font-face { font-family: "Cormorant"; font-weight: 500; font-style: normal; src: url("/fonts/Cormorant-Medium.ttf") format("truetype"); }
 @font-face { font-family: "Cormorant"; font-weight: 600; font-style: normal; src: url("/fonts/Cormorant-SemiBold.ttf") format("truetype"); }
-@font-face { font-family: "Cormorant"; font-weight: 700; font-style: normal; src: url("/fonts/Cormorant-Bold.ttf") format("truetype"); }
-@font-face { font-family: "Cormorant"; font-weight: 400; font-style: italic; src: url("/fonts/Cormorant-Italic.ttf") format("truetype"); }
 @font-face { font-family: "Cormorant"; font-weight: 500; font-style: italic; src: url("/fonts/Cormorant-MediumItalic.ttf") format("truetype"); }
-@font-face { font-family: "Cormorant"; font-weight: 600; font-style: italic; src: url("/fonts/Cormorant-SemiBoldItalic.ttf") format("truetype"); }
-@font-face { font-family: "Mulish"; font-weight: 300; src: url("/fonts/Mulish-Light.ttf") format("truetype"); }
 @font-face { font-family: "Mulish"; font-weight: 400; src: url("/fonts/Mulish-Regular.ttf") format("truetype"); }
-@font-face { font-family: "Mulish"; font-weight: 500; src: url("/fonts/Mulish-Medium.ttf") format("truetype"); }
 @font-face { font-family: "Mulish"; font-weight: 600; src: url("/fonts/Mulish-SemiBold.ttf") format("truetype"); }
 @font-face { font-family: "Mulish"; font-weight: 700; src: url("/fonts/Mulish-Bold.ttf") format("truetype"); }
 @font-face { font-family: "Mulish"; font-weight: 800; src: url("/fonts/Mulish-ExtraBold.ttf") format("truetype"); }
@@ -116,8 +113,6 @@ export const PLAN_VIEW_CSS = String.raw`
 .plan-view .recipes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .plan-view .rcard { display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--hair); border-radius: var(--radius-s); overflow: hidden; text-decoration: none; color: var(--ink); box-shadow: var(--shadow-s); break-inside: avoid; }
 .plan-view .rcard__thumb { position: relative; aspect-ratio: 16 / 10; background: var(--primary-tint-2); overflow: hidden; }
-.plan-view .rcard__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.plan-view .rcard__thumb::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(40,20,45,.34)); }
 .plan-view .rcard__play { position: absolute; inset: 0; display: grid; place-items: center; z-index: 2; }
 .plan-view .rcard__play span { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,.92); color: var(--primary); display: grid; place-items: center; box-shadow: 0 6px 16px -6px rgba(0,0,0,.5); }
 .plan-view .rcard__play svg { width: 16px; height: 16px; margin-left: 2px; }
